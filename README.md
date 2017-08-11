@@ -8,7 +8,7 @@ Retrieves functions, symbols, bookmarks from text or source files and lists refe
 - a side editor opens and shows a functions reference list
 - click a reference
 
-![funclist in action](https://github.com/qrti/funcList/blob/master/funcList.gif)
+![funclist in action](images/funcList.gif)
 
 # Settings
 __.vscode/settings.json__
