@@ -2,7 +2,7 @@
     "name": "funclist",
     "displayName": "Show Functions",
     "description": "List functions, symbols, bookmarks by configurable regular expressions",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "publisher": "qrti",
     "author": {
         "name": "qrti"
@@ -74,12 +74,12 @@
             "properties": {
                 "funcList.nativeFilter": {
                     "type": "string",
-                    "default": "/^[a-z0-9_]+:\\S*$/mgi",
+                    "default": "/^[a-z]+\\s+\\w+\\(/mgi",
                     "description": "regEx to build native match list"
                 },
                 "funcList.displayFilter": {
                     "type": "string",
-                    "default": "/[^: ]+/",
+                    "default": "/\\S* (.+)/1",
                     "description": "regEx to trim native matches for display"
                 },
                 "funcList.sortList": {

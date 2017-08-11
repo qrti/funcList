@@ -47,7 +47,7 @@ will be listed _(displayFilter allows regEx groups 0-9 in options)_
 
 ### Simple C Function Filter
 
-    "funcList.nativeFilter": "/^[a-z]+\\s+[a-z]+\\(/mgi"
+    "funcList.nativeFilter": "/^[a-z]+\\s+\\w+\\(/mgi"
 
 `int main(`  
 `void initSerial(`  
