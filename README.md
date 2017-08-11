@@ -13,7 +13,7 @@ Retrieves functions, symbols, bookmarks from text or source files and lists refe
 # Settings
 __.vscode/settings.json__
 
-    "funcList.nativeFilter": "/^[a-z0-9_]+:\\S*$/mgi",
+    "funcList.nativeFilter": "/^[a-z]+\\s+\\w+\\(/mgi",
     "funcList.displayFilter": "/\\S* (.+)/1",
     "funcList.sortList": 1
 
