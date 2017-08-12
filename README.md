@@ -53,7 +53,7 @@ will be listed _(displayFilter allows regEx groups 0-9 in options)_
 `void initSerial(`  
 simple function headers will be found
 
-    "funcList.displayFilter": "/\\S* (.+)/1"
+    "funcList.displayFilter": "/\\S* +(\\w+)/1"
 
 `main`  
 `initSerial`  
