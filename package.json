@@ -2,7 +2,7 @@
     "name": "funclist",
     "displayName": "Show Functions",
     "description": "List functions, symbols, bookmarks by configurable regular expressions",
-    "version": "0.5.4",
+    "version": "0.6.0",
     "publisher": "qrti",
     "author": {
         "name": "qrti"
@@ -96,9 +96,9 @@
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "devDependencies": {
+        "@types/node": "^6.0.88",
         "tslint": "^3.8.1",
         "typescript": "^2.1.4",
-        "vscode": "^1.0.0",
-        "@types/node": "^6.0.40"
+        "vscode": "^1.0.0"
     }
 }

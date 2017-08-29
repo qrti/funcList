@@ -4,7 +4,7 @@ Retrieves functions, symbols, bookmarks from text or source files and lists refe
 
 - open a C source file  
   see [Examples](#examples) for different file settings
-- select `F1 > Function List`
+- select `F1 > Show Functions`
 - a side editor opens and shows a functions reference list
 - click a reference
 
@@ -26,8 +26,6 @@ regular expression to trim matches of nativeFilter for clean display
 `sortList`  
 0 = natural (order of appearance)  
 1 = alphabetic 
-
-_wrong formulated regular expressions may cause unpredictable display results_
 
 # Examples
 
@@ -87,6 +85,21 @@ targets are listed without colon
 - multiple found references are marked with bracketed numbers  
   they are selectable with consecutive clicks  
 - multiple lists can exist for one source file
+
+# Flaws
+- avoid editing reference lists  
+  references may mess up (-> [History](#history))  
+  vsCode API has no possibility to make untitled file scheme documents read only
+- wrong formulated regular expressions may cause unpredictable display results
+
+# History
+
+- __V0.5__  
+  based on document content provider  
+  reference lists are read only and have to be closed and reopened for refresh and therefore loose user set width 
+- __V0.6__  
+  based on untitled file scheme  
+  reference lists are editable and refresh keeps user set width (-> [Flaws](#flaws))
 
 # How to run locally
 
