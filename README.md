@@ -18,30 +18,32 @@ __.vscode/settings.json__
     "funcList.sortList": 1
 
 `nativeFilter`  
-regular expression to match functions, symbols, bookmarks
+regular expression to match functions, symbols, bookmarks  
+_(nativeFilter does not allow regEx groups)_
 
 `displayFilter`  
-regular expression to trim matches of nativeFilter for clean display
+regular expression to trim matches of nativeFilter for clean display  
+_(displayFilter allows regEx groups 0-9 in options, see examples)_
 
 `sortList`  
 0 = natural (order of appearance)  
-1 = alphabetic 
+1 = alphabetic
 
 # Examples
 
-### Bookmark Filter
+### TypeScript Filter
 
-    "funcList.nativeFilter": "/^bookmark .+$/mgi"
+    "funcList.nativeFilter": "/(?:^|\\s)function\\s+\\w+\\(/mg"
 
-`bookmark my mark 123`  
-`bookmark huubaBooba`  
-or similar will be found _(nativeFilter does not allow regEx groups)_
+`function encodeLocation(`  
+`function dispose(`  
+simple functions will be found
 
-    "funcList.displayFilter": "/\\S* (.+)/1"
+    "funcList.displayFilter": "/\\s*function\\s+(\\w+)/1"
 
-`my mark 123`  
-`huubaBooba`  
-will be listed _(displayFilter allows regEx groups 0-9 in options)_
+`encodeLocation`  
+`dispose`  
+function names without keyword and opening bracket will be displayed
 
 ### Simple C Function Filter
 
@@ -59,21 +61,35 @@ function names without return value and opening bracket will be displayed
 
 ### Assembler Target Filter
 
-    "funcList.nativeFilter": "/^[a-z0-9_]+:\\S*$/mgi"
+    "funcList.nativeFilter": "/^\\w+:\\s*$/mg"
 
 `encodeByte:`  
 `doSleep:`  
-standalone targets are found
+standalone targets on beginning of lines are found
 
 `mar01: mov r0,r1`  
 `abc17: ;comment`  
 targets with following instruction or comment are not found
 
-    "funcList.displayFilter": "/[^: ]+/"
+    "funcList.displayFilter": "/\\w+/"
     
 `encodeByte`  
 `doSleep`  
-targets are listed without colon
+targets are listed without colon or trailing spaces
+
+### Bookmark Filter
+
+    "funcList.nativeFilter": "/^bookmark .+$/mg"
+
+`bookmark my mark 123`  
+`bookmark huubaBooba`  
+or similar will be found
+
+    "funcList.displayFilter": "/\\w+\\s+(.*\\w)/1"
+
+`my mark 123`  
+`huubaBooba`  
+will be listed
 
 # Hints
 
@@ -90,6 +106,8 @@ targets are listed without colon
 - avoid editing reference lists  
   references may mess up (-> [History](#history))  
   vsCode API has no possibility to make untitled file scheme documents read only
+- closing reference lists or vsCode will pop up a save dialog  
+  (pressing 'Save' will not save the list)
 - wrong formulated regular expressions may cause unpredictable display results
 
 # History
@@ -100,7 +118,11 @@ targets are listed without colon
 - __V0.6__  
   based on untitled file scheme  
   reference lists are editable and refresh keeps user set width (-> [Flaws](#flaws))
-
+- __V0.6.1__  
+  strip CR and LF from native filter to resolve [Issue 1](https://github.com/qrti/funcList/issues/1)  
+  example for TypeScript filter  
+  revised examples
+  
 # How to run locally
 
 - `npm run compile`  

@@ -18,14 +18,6 @@ export function activate(context: ExtensionContext)
     let contextMenuRefresh = commands.registerTextEditorCommand('contextmenu.refresh', (editor, edit) => {
         provider.updateDocument(editor, edit, false);
     });
-
-    // let contextMenuSwitchSort = commands.registerCommand('contextmenu.switchSort', () => {
-    //     provider.handleDocument(window.activeTextEditor, true);
-    // });
-    
-    // let contextMenuRefresh = commands.registerCommand('contextmenu.refresh', () => {
-    //     provider.handleDocument(window.activeTextEditor, false);
-    // });
         
 	context.subscriptions.push(
 		provider,

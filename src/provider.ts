@@ -70,8 +70,8 @@ export default class Provider
             let funcDoc = this._funcDocs.get(editor.document.uri.toString());   // stored target document value
             let native = funcDoc.getNative(symbolIndex);                        // get native symbol string
 
-            let chars = { '(':'\\(', ')':'\\)', '[':'\\[' };                    // replacement pairs, name:value
-            let filter = native.replace(/[()[]/g, m => chars[m]);               // replace /[names]/globaly through values
+            let chars = { '(':'\\(', ')':'\\)', '[':'\\[', '\n':'', '\r':'' };  // replacement pairs, name:value
+            let filter = native.replace(/[()[\n\r]/g, m => chars[m]);           // replace /[names]/globally through values
             
             let docContent = sourceEditor.document.getText();                   // get source document content
             let sourceLines = docContent.split("\r\n");                         // split lines
@@ -84,7 +84,7 @@ export default class Provider
             
             let hit = this._lastHit;                                            // last hit shortcut        
 
-            if(lines){                                                          // any lines?
+            if(lines.length){                                                   // any lines?
                 let lineIndex = 0;                                              // assume first match in lines
 
                 if(hit.editor==sourceEditor && hit.native==native && hit.lineIndex<lines.length){   // same editor, same match, hit index in range
