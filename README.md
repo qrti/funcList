@@ -1,5 +1,4 @@
 # FuncList
-
 Retrieves functions, symbols, bookmarks from text or source files and lists references in a side editor. Clicking a references will reveal the corresponding position in text or source file.
 
 - open a C source file  
@@ -30,7 +29,6 @@ _(displayFilter allows regEx groups 0-9 in options, see examples)_
 1 = alphabetic
 
 # Examples
-
 ### TypeScript Filter
 
     "funcList.nativeFilter": "/(?:^|\\s)function\\s+\\w+\\(/mg"
@@ -46,7 +44,6 @@ simple functions will be found
 function names without keyword and opening bracket will be displayed
 
 ### Simple C Function Filter
-
     "funcList.nativeFilter": "/^[a-z]+\\s+\\w+\\(/mgi"
 
 `int main(`  
@@ -60,7 +57,6 @@ simple function headers will be found
 function names without return value and opening bracket will be displayed
 
 ### Assembler Target Filter
-
     "funcList.nativeFilter": "/^\\w+:\\s*$/mg"
 
 `encodeByte:`  
@@ -78,7 +74,6 @@ targets with following instruction or comment are not found
 targets are listed without colon or trailing spaces
 
 ### Bookmark Filter
-
     "funcList.nativeFilter": "/^bookmark .+$/mg"
 
 `bookmark my mark 123`  
@@ -92,7 +87,6 @@ or similar will be found
 will be listed
 
 # Hints
-
 - reference lists contribute two context menu entries  
   _'Switch Sort'_ for switching sort mode  
   _'Refresh'_ for manual refreshing the reference list
@@ -101,6 +95,8 @@ will be listed
 - multiple found references are marked with bracketed numbers  
   they are selectable with consecutive clicks  
 - multiple lists can exist for one source file
+- to avoid reload of reference list files change user settings to  
+  `"files.hotExit": "off"`
 
 # Flaws
 - avoid editing reference lists  
@@ -111,7 +107,6 @@ will be listed
 - wrong formulated regular expressions may cause unpredictable display results
 
 # History
-
 - __V0.5__  
   based on document content provider  
   reference lists are read only and have to be closed and reopened for refresh and therefore loose user set width 
@@ -124,7 +119,6 @@ will be listed
   revised examples
   
 # How to run locally
-
 - `npm run compile`  
 to start the compiler in watch mode
 - open this folder in vsCode and press `F5`
