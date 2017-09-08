@@ -7,26 +7,31 @@ export function activate(context: ExtensionContext)
 {
 	const provider = new ContentProvider();
 
+	const providerRegistrations = Disposable.from(
+		workspace.registerTextDocumentContentProvider(ContentProvider.scheme, provider)
+	);
+    
 	const commandRegistration = commands.registerTextEditorCommand('editor.printFunctions', editor => {
         return provider.newDocument(editor);
 	});
 
-    let contextMenuSwitchSort = commands.registerTextEditorCommand('contextmenu.switchSort', (editor, edit) => {
-        provider.updateDocument(editor, edit, true);
+    let contextMenuSwitchSort = commands.registerCommand('contextmenu.switchSort', () => {
+        provider.updateDocument(true);
     });
     
-    let contextMenuRefresh = commands.registerTextEditorCommand('contextmenu.refresh', (editor, edit) => {
-        provider.updateDocument(editor, edit, false);
+    let contextMenuRefresh = commands.registerCommand('contextmenu.refresh', () => {
+        provider.updateDocument(false);
     });
         
 	context.subscriptions.push(
 		provider,
         commandRegistration,
         contextMenuSwitchSort,
-        contextMenuRefresh
+        contextMenuRefresh,
+        providerRegistrations
     );
 }
 
 export function deactivate() 
-{
+{    
 }

@@ -4,7 +4,7 @@ Retrieves functions, symbols, bookmarks from text or source files and lists refe
 - open a C source file  
   see [Examples](#examples) for different file settings
 - select `F1 > Show Functions`
-- a side editor opens and shows a functions reference list
+- a side editor opens and shows a reference list
 - click a reference
 
 ![funclist in action](images/funcList.gif)
@@ -44,6 +44,7 @@ simple functions will be found
 function names without keyword and opening bracket will be displayed
 
 ### Simple C Function Filter
+
     "funcList.nativeFilter": "/^[a-z]+\\s+\\w+\\(/mgi"
 
 `int main(`  
@@ -57,6 +58,7 @@ simple function headers will be found
 function names without return value and opening bracket will be displayed
 
 ### Assembler Target Filter
+
     "funcList.nativeFilter": "/^\\w+:\\s*$/mg"
 
 `encodeByte:`  
@@ -74,6 +76,7 @@ targets with following instruction or comment are not found
 targets are listed without colon or trailing spaces
 
 ### Bookmark Filter
+
     "funcList.nativeFilter": "/^bookmark .+$/mg"
 
 `bookmark my mark 123`  
@@ -91,20 +94,12 @@ will be listed
   _'Switch Sort'_ for switching sort mode  
   _'Refresh'_ for manual refreshing the reference list
 - reference list tab names are surrounded by brackets
-- reference lists are read only
+- reference lists are read only and can't be saved
 - multiple found references are marked with bracketed numbers  
-  they are selectable with consecutive clicks  
-- multiple lists can exist for one source file
-- to avoid reload of reference list files change user settings to  
-  `"files.hotExit": "off"`
-
-# Flaws
-- avoid editing reference lists  
-  references may mess up (-> [History](#history))  
-  vsCode API has no possibility to make untitled file scheme documents read only
-- closing reference lists or vsCode will pop up a save dialog  
-  (pressing 'Save' will not save the list)
-- wrong formulated regular expressions may cause unpredictable display results
+  selectable with consecutive clicks  
+- source files can have multiple reference lists  
+  slanted tab names indicate temporary lists  
+  double click tabs to make them resident
 
 # History
 - __V0.5__  
@@ -117,6 +112,10 @@ will be listed
   strip CR and LF from native filter to resolve [Issue 1](https://github.com/qrti/funcList/issues/1)  
   example for TypeScript filter  
   revised examples
+- __V0.7.0__  
+  back to (improved) document content provider  
+  reference lists are read only and keep user set width  
+  no side effects when closing document or vscode  
   
 # How to run locally
 - `npm run compile`  

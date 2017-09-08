@@ -1,11 +1,10 @@
 // funcList extension for vsCode V0.6 by qrt@qland.de 170829
 //
-// V0.5     initial
+// V0.5     initial, document content provider
 // V0.6     regular TextDocument -> refreshable without closing -> keeps width
+// V0.7     back to (modified) document content provider
 //
 // todo:
-// - block source doc positioning on target refresh, only possible by catching mouse events
-// - target readonly 
 
 'use strict';
 
@@ -13,10 +12,12 @@ import * as vscode from 'vscode';
 import { workspace, window, Disposable, Uri, Position } from 'vscode';
 import FunctionsDocument from './functionsDocument';
 
-export default class Provider           
+export default class Provider implements vscode.TextDocumentContentProvider        
 {
-	static scheme = 'untitled';
+	static scheme = 'functions';
 
+    // private _onDidChange = new vscode.EventEmitter<Uri>();       
+    
     private _funcDocs = new Map<string, FunctionsDocument>();
     private _timer = new Timer();    
     private _subscriptions: Disposable[] = [];
@@ -30,16 +31,21 @@ export default class Provider
         // workspace.onDidChangeTextDocument(change => this._onDidChangeTextDocument(change), this, this._subscriptions);
         window.onDidChangeTextEditorSelection(change => this._onDidChangeTextEditorSelection(change), this, this._subscriptions);                            
         workspace.onDidCloseTextDocument(doc => this._funcDocs.delete(doc.uri.toString()), this, this._subscriptions);      // fires several minutes after closing document
-        
+
         this._disposable = Disposable.from(...(this._subscriptions));
-    }
+    }    
 
     public dispose() 
-    {
+    {                 
         this._disposable.dispose();
-		this._funcDocs.clear();
+        this._funcDocs.clear();
+        // this._onDidChange.dispose();        
 	}
-        
+
+    // get onDidChange(){                                                          // expose an event to signal changes of _virtual_ documents to the editor
+    //     return this._onDidChange.event;
+	// }
+
     // private _onDidChangeTextDocument(change: vscode.TextDocumentChangeEvent) 
     // {
     // }
@@ -48,14 +54,14 @@ export default class Provider
     {    
         let editor = change.textEditor;                                                 // get active editor
 
-        if(editor.document.isUntitled && editor.document.fileName.endsWith(')'))        // funcList files only 
+        if(editor.document.uri.scheme === Provider.scheme)                              // funcList files only 
             if(!this._timer.timeLeft())                                                 // last timer ready?
                 this._timer.start(() => this.posSourceSelTarget(editor), 50, 100);      // delay, block
     }
 
     private posSourceSelTarget(editor)
     {
-        let sourceFsPath = this.decodeFsPath(editor.document.uri);              // get original source fsPath from target uri.query
+        let sourceFsPath = decodeFsPath(editor.document.uri);                   // get original source fsPath from target uri.query
 
         // find current sourceEditor for original source fsPath, 
         // the original sourceEditor gets unvalid every time it loses focus
@@ -69,9 +75,9 @@ export default class Provider
 
             let funcDoc = this._funcDocs.get(editor.document.uri.toString());   // stored target document value
             let native = funcDoc.getNative(symbolIndex);                        // get native symbol string
-
-            let chars = { '(':'\\(', ')':'\\)', '[':'\\[', '\n':'', '\r':'' };  // replacement pairs, name:value
-            let filter = native.replace(/[()[\n\r]/g, m => chars[m]);           // replace /[names]/globally through values
+            
+            let chars = { '(':'\\(', ')':'\\)', '[':'\\[' };                    // replacement pairs, name:value
+            let filter = native.replace(/[()[]/g, m => chars[m]);               // replace /[names]/globally through values
             
             let docContent = sourceEditor.document.getText();                   // get source document content
             let sourceLines = docContent.split("\r\n");                         // split lines
@@ -116,50 +122,47 @@ export default class Provider
         }
     }
 
-    // command palette 'Function List', context menu 'Switch Sort' + 'Refresh' 
+    // command palette 'Function List'
     //
-    public newDocument(editor)
+    public newDocument(sourceEditor)
     {                
-        if(editor.document.isUntitled && editor.document.fileName.endsWith(')')){                           // existing funcList file?                                    
-        }
-        else{                                                                                               // source editor
-            const target_uri = encodeLocation(editor.document.uri, editor.selection.active);                // encode traget uri
-            let sourceDoc = editor.document;                                                                // source document
+        if(sourceEditor.document.uri.scheme != Provider.scheme){                                            // existing funcList file?                                    
+            const targetUri = encodeLocation(sourceEditor.document.uri, sourceEditor.selection.active);     // encode target uri, source uri in query
 
-            let target_editor = workspace.openTextDocument(target_uri).then(targetDoc => {                  // open new TextDocument as target                     
-                let funcDoc = new FunctionsDocument(sourceDoc, targetDoc);                                  // instantiate new funcDoc
-                this._funcDocs.set(target_uri.toString(), funcDoc);                                         // add new funcDoc to funcDocs                                                            
-                window.showTextDocument(targetDoc, editor.viewColumn + 1);                                  // show new TextDocument                
-            });
+            workspace.openTextDocument(targetUri).then(targetDoc => {                                       // open new TextDocument as target                     
+                let xxx = window.showTextDocument(targetDoc, sourceEditor.viewColumn + 1).then(targetEditor => {      // show new TextDocument                     
+                    let funcDoc = new FunctionsDocument(sourceEditor, targetEditor);                        // instantiate and fill new funcDoc
+                    this._funcDocs.set(targetUri.toString(), funcDoc);                                      // add new funcDoc to funcDocs                                                            
+                });                                                             
+            });            
         }
 
-        return editor;
+        return null;
     }
     
-    public updateDocument(editor, edit, sortSwitch)
+    // context menu 'Switch Sort' + 'Refresh' 
+    //
+    public updateDocument(sortSwitch)
     {                
-        if(editor.document.isUntitled && editor.document.fileName.endsWith(')')){                           // existing funcList file?                                    
-            if(sortSwitch == null)                                                                          // called from command palette?
-                return null;                                                                                // yes, break
-            
-            let sourceFsPath = this.decodeFsPath(window.activeTextEditor.document.uri);                     // get original source fsPath from target uri.query
+        let editor = window.activeTextEditor;                                                               // get acvtive editor
+
+        if(editor.document.uri.scheme === Provider.scheme){                                                 // existing funcList file?                                               
+            let sourceFsPath = decodeFsPath(editor.document.uri);                                           // get original source fsPath from target uri.query
             let sourceEditor = window.visibleTextEditors.find(e => e.document.uri.fsPath === sourceFsPath); // find current sourceEditor for original source fsPath
             
-            if(!sourceEditor)                                                                               // source editor valid?
-                return null;                                                                                // no, break
-                           
-            let funcDoc = this._funcDocs.get(editor.document.uri.toString());                               // stored value for funcList file is funcDoc            
-            funcDoc.update(editor, edit, sortSwitch);                                                       // update or toggle sort                      
+            if(sourceEditor){                                                                               // source editor valid?
+                let funcDoc = this._funcDocs.get(editor.document.uri.toString());                           // stored value for funcList file is funcDoc            
+                funcDoc.update(editor, sortSwitch);                                                         // update or toggle sort                      
+            }
         }
-
-        return editor;
     }
 
-    private decodeFsPath(uri: Uri): string
-    {
-        let [target, line, character] = <[string, number, number]>JSON.parse(uri.query);
-        return decodeURIComponent(Uri.parse(target).toString()).split('///').pop().replace(/\//gi, "\\");
-    }    
+    // triggered by openTextDocument in newDocument
+    //
+    provideTextDocumentContent(target_uri: Uri): string | Thenable<string> 
+    {        
+        return "";                                                                                          // return empty document content
+	}                                                                                                       
 }
 
 //------------------------------------------------------------------------------
@@ -178,6 +181,12 @@ export function decodeLocation(uri: Uri): [Uri, Position]
 	let [target, line, character] = <[string, number, number]>JSON.parse(uri.query);
 	return [Uri.parse(target), new Position(line, character)];
 }
+
+export function decodeFsPath(uri: Uri): string
+{
+    let [target, line, character] = <[string, number, number]>JSON.parse(uri.query);
+    return decodeURIComponent(Uri.parse(target).toString()).split('///').pop().replace(/\//gi, "\\");
+}    
 
 // delay - for executing posSourceSelTarget
 // block - to block trailing selection events after posSourceSelTarget

@@ -2,23 +2,26 @@
 
 import * as vscode from 'vscode';
 import { workspace, window } from 'vscode';
-// import { stringRegExp } from './provider';
+import { decodeFsPath } from './provider';
 
 export default class FunctionsDocument
 {
     readonly NUM_SORTS = 2;
     
-    private _sourceDoc: vscode.TextDocument;
-    private _targetDoc: vscode.TextDocument;    
+    // private _emitter: vscode.EventEmitter<vscode.Uri>;    
+	private _targetEditor: vscode.TextEditor;
+	private _sourceEditor: vscode.TextEditor;
 	private _functionList: Map<string, {native: string, num: number, index: number}>;
     private _sort: number = 0;
 
 	private _lines: string[];
 
-    constructor(sourceDoc: vscode.TextDocument, targetDoc: vscode.TextDocument)
+    // constructor(target_uri: vscode.Uri, emitter: vscode.EventEmitter<vscode.Uri>)
+    constructor(sourceEditor: vscode.TextEditor, targetEditor: vscode.TextEditor)
     {
-        this._sourceDoc = sourceDoc;                                               
-        this._targetDoc = targetDoc;                                               
+        this._sourceEditor = sourceEditor;                                                    
+        this._targetEditor = targetEditor;                                                    
+		// this._emitter = emitter;                                        
         
         let config = workspace.getConfiguration('funcList');                        // get config
         let sort = +config.get("sortList");                                         // default sort for new FuncDoc
@@ -26,15 +29,15 @@ export default class FunctionsDocument
         this._functionList = this.getFunctionList();                                // get function list     
         this.sortFunctionList(sort);                                                // sort it if necessary
 
-        this.populate(null);                                                        // populate target
+        this.populate();                                                            // populate target
 	}
-
+    
     public getNative(index)
     {
         return Array.from(this._functionList.values())[index].native;               // stored native match
     }
 
-    public update(editor, edit, sortSwitch)
+    public update(editor, sortSwitch)
     {
         let posSel = new vscode.Position(0, 0);                                     // jump to first line        
         let selection = new vscode.Selection(posSel, posSel);                       // no selection
@@ -54,10 +57,10 @@ export default class FunctionsDocument
             this.sortFunctionList(sort);                                            // sort
         }
 
-        this.populate(edit);                                                        // populate target            
+        this.populate();                                                            // populate target            
     }
 
-    private populate(edit) 
+    private populate() 
     {
         this._lines = [`(${this._functionList.size} matches, ${this._sort ? 'sorted' : 'unsorted'})\n`];
 
@@ -65,33 +68,40 @@ export default class FunctionsDocument
             this._lines.push(display + (value.num==1 ? "" : ` (${value.num})`));
         });
 
-        applyEdit(this._targetDoc, edit, {start: {line: 0, char: 0}, end: {line: Number.MAX_SAFE_INTEGER, char: 0}}, this._lines.join('\n'));           
+        let targetDoc = this._targetEditor.document;
+        applyEdit(targetDoc, {start: {line: 0, char: 0}, end: {line: Number.MAX_SAFE_INTEGER, char: 0}}, this._lines.join('\n'));           
+
+        // this._emitter.fire(this._target_uri);        
     }
 
     private getFunctionList()
     {
+        let sourceDoc = this._sourceEditor.document;                                // get source document
+
         let config = workspace.getConfiguration('funcList');                        // get config
         let nativeFilter = stringRegExp(config.get("nativeFilter"));                // native  filter
 
         let grin = { value: 0 };                                                    // group index
         let displayFilter = stringRegExp(config.get("displayFilter"), grin);        // display 
 
-        let docContent = this._sourceDoc.getText();                                 // get doc text
+        let docContent = sourceDoc.getText();                                       // get doc text
         let native = docContent.match(nativeFilter);                                // nativeFind array    
         
         let map = new Map<string, { native: string, num: number, index: number }>();    // displayFind, { nativeFind, numFind, findIndex }
 
         if(native){
             let i = 0;                                                              // findIndex
+            let chars = { '\n':'', '\r':'' };                                       // replacement pairs, name:value
 
             native.forEach(native => {
-                let display = native.match(displayFilter)[grin.value];              // display filter
+                let nativec = native.replace(/[\n\r]/g, m => chars[m]);             // native cleaned stripped CR and LF
+                let display = nativec.match(displayFilter)[grin.value];             // display filter
                 let value = map.get(display);                                       // get { nativeFind, numFind }
                 
                 if(value)                                                           // existing { nativeFind, numFind }
                     value.num++;
                 else                                                                // initial
-                    map.set(display, { native: native, num: 1, index: i++ });
+                    map.set(display, { native: nativec, num: 1, index: i++ });
             });
         }
 
@@ -128,19 +138,14 @@ function stringRegExp(s: string, grin?: { value: number } ): RegExp
     return new RegExp(pattern, flags);    
 }
 
-function applyEdit(doc, edit: vscode.TextEditorEdit, coords, content)
+function applyEdit(doc, coords, content)
 {    
     let start = new vscode.Position(coords.start.line, coords.start.char);
     let end = new vscode.Position(coords.end.line, coords.end.char);
     let range = new vscode.Range(start, end);   
     
-    if(edit){
-        edit.replace(range, content);        
-    }
-    else{
-        let wedit = new vscode.TextEdit(range, content);                    
-        let workspaceEdit = new vscode.WorkspaceEdit();
-        workspaceEdit.set(doc.uri, [wedit]);
-        workspace.applyEdit(workspaceEdit);    
-    }
+    let wedit = new vscode.TextEdit(range, content);                    
+    let workspaceEdit = new vscode.WorkspaceEdit();
+    workspaceEdit.set(doc.uri, [wedit]);
+    workspace.applyEdit(workspaceEdit);    
 }
