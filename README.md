@@ -14,7 +14,8 @@ __.vscode/settings.json__
 
     "funcList.nativeFilter": "",
     "funcList.displayFilter": "",
-    "funcList.sortList": 1
+    "funcList.sortList": 1,
+    "funcList.doubleSpacing": false
 
 `nativeFilter`  
 regular expression to match functions, symbols, bookmarks  
@@ -27,6 +28,11 @@ _(displayFilter allows regEx groups 0-9 in options, see examples)_
 `sortList`  
 0 = natural (order of appearance)  
 1 = alphabetic
+
+`doubleSpacing`  
+extended space in symbol list  
+false = off  
+true = on
 
 # Examples
 ### TypeScript Filter
@@ -107,16 +113,20 @@ will be listed
   reference lists are read only and have to be closed and reopened for refresh and therefore loose user set width 
 - __V0.6__  
   based on untitled file scheme  
-  reference lists are editable and refresh keeps user set width (-> [Flaws](#flaws))
+  reference lists are editable and refresh keeps user set width
 - __V0.6.1__  
-  strip CR and LF from native filter to resolve [Issue 1](https://github.com/qrti/funcList/issues/1)  
+  strip CR/LF from native filter to resolve [Issue 1](https://github.com/qrti/funcList/issues/1)  
   example for TypeScript filter  
   revised examples
-- __V0.7.0__  
+- __V7.0.0__  
   back to (improved) document content provider  
   reference lists are read only and keep user set width  
   no side effects when closing document or vscode  
-  
+
+- __V7.1.0__  
+  new option 'doubleSpacing' -> [Settings](#settings)  
+  fixed CR/LF bug for Unix/Linux/MacOS documents, addresses again [Issue 1](https://github.com/qrti/funcList/issues/1)
+
 # How to run locally
 - `npm run compile`  
 to start the compiler in watch mode

@@ -1,10 +1,13 @@
-// funcList extension for vsCode V0.6 by qrt@qland.de 170829
+// funcList extension for vsCode V7.1.0 by qrt@qland.de 171013
 //
 // V0.5     initial, document content provider
 // V0.6     regular TextDocument -> refreshable without closing -> keeps width
-// V0.7     back to (modified) document content provider
-//
+// V7.0.0   back to (modified) document content provider
+// V7.1.0   changed end of line handling
+// 
 // todo:
+// - double line space option
+// - position after calling F1/Show Functions
 
 'use strict';
 
@@ -24,7 +27,7 @@ export default class Provider implements vscode.TextDocumentContentProvider
     private _disposable: Disposable;
 
     private _lastHit: { editor: vscode.TextEditor, native: string, lineIndex: number } = 
-                      { editor: null,              native: null,   lineIndex: 0 };
+                      { editor: null,              native: null,   lineIndex: 0 };                          
 
     constructor() 
     {
@@ -68,19 +71,29 @@ export default class Provider implements vscode.TextDocumentContentProvider
         let sourceEditor = window.visibleTextEditors.find(editor => editor.document.uri.fsPath === sourceFsPath);
 
         if(sourceEditor){                                                       // invalid or disposed?  
-            let symbolIndex = editor.selection.start.line - 2;                  // index of symbol, -2 on lines 0 and 1
-            
+            let funcDoc = this._funcDocs.get(editor.document.uri.toString());   // stored target document value
+            let doubleSpacing = funcDoc.getDoubleSpacing();                     // get double spacing
+            let symbolIndex = editor.selection.start.line - 2;                  // first valid line
+
+            if(doubleSpacing){                                                  // handle double spacing
+                symbolIndex -= 1;                                               // correct first valid line
+
+                if(Math.round(symbolIndex % 2))                                 // spacing line?
+                    return;                                                     // break
+
+                symbolIndex = Math.round(symbolIndex / 2 + 0.1);                // calc line
+            }
+
             if(symbolIndex < 0)                                                 // no source document positioning
                 return;                                                         // after updateDocument or line 0 or 1 click
 
-            let funcDoc = this._funcDocs.get(editor.document.uri.toString());   // stored target document value
             let native = funcDoc.getNative(symbolIndex);                        // get native symbol string
-            
-            let chars = { '(':'\\(', ')':'\\)', '[':'\\[' };                    // replacement pairs, name:value
+
+            let chars = { '(':'\\(', ')':'\\)', '[':'\\[', '\r':'' };           // replacement pairs, name:value
             let filter = native.replace(/[()[]/g, m => chars[m]);               // replace /[names]/globally through values
             
             let docContent = sourceEditor.document.getText();                   // get source document content
-            let sourceLines = docContent.split("\r\n");                         // split lines
+            let sourceLines = docContent.split("\n");                           // split lines            
             let lines: number[] = [];                                           // prepare match lines number array
             
             sourceLines.forEach((line, i) => {                                  // iterate through sourceLines
@@ -152,7 +165,7 @@ export default class Provider implements vscode.TextDocumentContentProvider
             
             if(sourceEditor){                                                                               // source editor valid?
                 let funcDoc = this._funcDocs.get(editor.document.uri.toString());                           // stored value for funcList file is funcDoc            
-                funcDoc.update(editor, sortSwitch);                                                         // update or toggle sort                      
+                funcDoc.update(sortSwitch);                                                                 // update or toggle sort                      
             }
         }
     }

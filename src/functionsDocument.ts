@@ -13,6 +13,7 @@ export default class FunctionsDocument
 	private _sourceEditor: vscode.TextEditor;
 	private _functionList: Map<string, {native: string, num: number, index: number}>;
     private _sort: number = 0;
+    private _doubleSpacing: boolean;
 
 	private _lines: string[];
 
@@ -25,6 +26,7 @@ export default class FunctionsDocument
         
         let config = workspace.getConfiguration('funcList');                        // get config
         let sort = +config.get("sortList");                                         // default sort for new FuncDoc
+        this._doubleSpacing = config.get("doubleSpacing");                          // double spacing
 
         this._functionList = this.getFunctionList();                                // get function list     
         this.sortFunctionList(sort);                                                // sort it if necessary
@@ -32,19 +34,18 @@ export default class FunctionsDocument
         this.populate();                                                            // populate target
 	}
     
-    public getNative(index)
+    public getNative(index)                                                         // return stored native match
     {
-        return Array.from(this._functionList.values())[index].native;               // stored native match
+        return Array.from(this._functionList.values())[index].native;               
     }
 
-    public update(editor, sortSwitch)
+    public getDoubleSpacing()                                                       // return double spacing
     {
-        let posSel = new vscode.Position(0, 0);                                     // jump to first line        
-        let selection = new vscode.Selection(posSel, posSel);                       // no selection
-        let range = new vscode.Range(posSel, posSel);
-        editor.revealRange(range);          
-        editor.selection = selection;                
+        return this._doubleSpacing;
+    }
 
+    public update(sortSwitch)
+    {
         if(sortSwitch){  
             let sort = this._sort;                                                  // switchSort
             sort = ++sort>=this.NUM_SORTS ? 0 : sort;                               // switch sort            
@@ -69,7 +70,13 @@ export default class FunctionsDocument
         });
 
         let targetDoc = this._targetEditor.document;
-        applyEdit(targetDoc, {start: {line: 0, char: 0}, end: {line: Number.MAX_SAFE_INTEGER, char: 0}}, this._lines.join('\n'));           
+        applyEdit(targetDoc, {start: {line: 0, char: 0}, end: {line: Number.MAX_SAFE_INTEGER, char: 0}}, this._lines.join(this._doubleSpacing ? '\n\n' : '\n'));           
+        
+        let posSel = new vscode.Position(0, 0);                                     // jump to first line        
+        let selection = new vscode.Selection(posSel, posSel);                       // no selection 
+        let range = new vscode.Range(posSel, posSel);                               // to prevent source positioning
+        this._targetEditor.revealRange(range);          
+        this._targetEditor.selection = selection;                        
 
         // this._emitter.fire(this._target_uri);        
     }
