@@ -1,6 +1,10 @@
 # FuncList
 Retrieves functions, symbols, bookmarks from text or source files and lists references in a side editor. Clicking a references will reveal the corresponding position in text or source file.
 
+**New version with bugfixes and additional sort option**  
+-> [History](#history) 
+
+### Short Test Drive
 - open a C source file  
   see [Examples](#examples) for different file settings
 - select `F1 > Show Functions`
@@ -26,8 +30,9 @@ regular expression to trim matches of nativeFilter for clean display
 _(displayFilter allows regEx groups 0-9 in options, see examples)_
 
 `sortList`  
-0 = natural (order of appearance)  
-1 = alphabetic
+0 = unsorted, order of appearance (appear)  
+1 = sorted, ignore case (nocase)  
+2 = sorted, obey case (case)
 
 `doubleSpacing`  
 extended space in symbol list  
@@ -47,7 +52,9 @@ simple functions will be found
 
 `encodeLocation`  
 `dispose`  
-function names without keyword and opening bracket will be displayed
+function names without keyword and opening bracket will be displayed  
+
+_(Thanks to Avol-V)_
 
 ### Simple C Function Filter
 
@@ -80,6 +87,13 @@ targets with following instruction or comment are not found
 `encodeByte`  
 `doSleep`  
 targets are listed without colon or trailing spaces
+
+### PowerShell Function Filter
+
+"funcList.nativeFilter": "/function\\s+\\w+-?\\w*\\s*{/img"  
+"funcList.displayFilter": "/function\\s+(\\w+-?\\w*)/1i"
+
+_(Thanks to Paradox355)_
 
 ### Bookmark Filter
 
@@ -126,6 +140,14 @@ will be listed
 - __V7.1.0__  
   new option 'doubleSpacing' -> [Settings](#settings)  
   fixed CR/LF bug for Unix/Linux/MacOS documents, addresses again [Issue 1](https://github.com/qrti/funcList/issues/1)
+
+- __V7.1.1__  
+  new example filter for PowerShell functions -> [Examples](#powershell-function-filter)
+
+- __V7.2.1__  
+  new sort options -> [Settings](#settings)  
+  linux/mac path bug fix  
+  corrected symbol match
 
 # How to run locally
 - `npm run compile`  

@@ -2,7 +2,7 @@
     "name": "funclist",
     "displayName": "Show Functions",
     "description": "List functions, symbols, bookmarks by configurable regular expressions",
-    "version": "7.1.0",
+    "version": "7.2.1",
     "publisher": "qrti",
     "author": {
         "name": "qrti"
@@ -85,13 +85,13 @@
                 "funcList.sortList": {
                     "type": "number",
                     "default": 0,
-                    "description": "0=natural, 1=alpha"
+                    "description": "0=appear, 1=nocase, 2=case"
                 },
                 "funcList.doubleSpacing": {
                     "type": "boolean",
                     "default": false,
                     "description": "false=off, true=on"
-                }                
+                }
             }
         }
     },

@@ -6,7 +6,7 @@ import { decodeFsPath } from './provider';
 
 export default class FunctionsDocument
 {
-    readonly NUM_SORTS = 2;
+    readonly NUM_SORTS = 3;
     
     // private _emitter: vscode.EventEmitter<vscode.Uri>;    
 	private _targetEditor: vscode.TextEditor;
@@ -61,9 +61,15 @@ export default class FunctionsDocument
         this.populate();                                                            // populate target            
     }
 
+    public getNativeFilter()
+    {
+        let config = workspace.getConfiguration('funcList');                        // get config
+        return stringRegExp(config.get("nativeFilter")); 
+    }
+
     private populate() 
     {
-        this._lines = [`(${this._functionList.size} matches, ${this._sort ? 'sorted' : 'unsorted'})\n`];
+        this._lines = [`(${this._functionList.size} matches, ${this._sort ? this._sort==1 ? 'nocase' : 'case' : 'appear'})\n`];
 
         this._functionList.forEach((value, display) => {
             this._lines.push(display + (value.num==1 ? "" : ` (${value.num})`));
@@ -86,7 +92,7 @@ export default class FunctionsDocument
         let sourceDoc = this._sourceEditor.document;                                // get source document
 
         let config = workspace.getConfiguration('funcList');                        // get config
-        let nativeFilter = stringRegExp(config.get("nativeFilter"));                // native  filter
+        let nativeFilter = stringRegExp(config.get("nativeFilter"));                // native filter
 
         let grin = { value: 0 };                                                    // group index
         let displayFilter = stringRegExp(config.get("displayFilter"), grin);        // display 
@@ -117,13 +123,22 @@ export default class FunctionsDocument
 
     private sortFunctionList(sort: number)
     {
-        if(sort == this._sort)                                                      // no sort necessary
+        if(sort == this._sort){                                                     // no sort necessary
             return;
-        else if(sort == 0)                                                          // sort value, index
+        }
+        else if(sort == 0){                                                         // appear, sort value, index
             this._functionList = new Map(Array.from(this._functionList).sort((a, b) => a[1].index - b[1].index)); 
-        else if(sort == 1)                                                          // sort key, display
+        }
+        else if(sort == 1){                                                         // nocase
+            this._functionList = new Map(Array.from(this._functionList).sort((a, b) => 
+                { var x=a[1].native.toLowerCase(); 
+                  var y=b[1].native.toLowerCase(); 
+                  return x === y ? 0 : x > y ? 1 : -1; })); 
+        }
+        else if(sort == 2){                                                         // case
             this._functionList = new Map(Array.from(this._functionList).sort());    
-        
+        }
+
         this._sort = sort;                                                          // update
     }
 }

@@ -1,9 +1,10 @@
-// funcList extension for vsCode V7.1.0 by qrt@qland.de 171013
+// funcList extension for vsCode V7.2.1 by qrt@qland.de 180610
 //
 // V0.5     initial, document content provider
 // V0.6     regular TextDocument -> refreshable without closing -> keeps width
 // V7.0.0   back to (modified) document content provider
 // V7.1.0   changed end of line handling
+// V7.2.1   linux/mac path bug fix, corrected symbol match, new sort option
 // 
 // todo:
 // - double line space option
@@ -69,8 +70,8 @@ export default class Provider implements vscode.TextDocumentContentProvider
         // find current sourceEditor for original source fsPath, 
         // the original sourceEditor gets unvalid every time it loses focus
         let sourceEditor = window.visibleTextEditors.find(editor => editor.document.uri.fsPath === sourceFsPath);
-
-        if(sourceEditor){                                                       // invalid or disposed?  
+        
+        if(sourceEditor){                                                       // invalid or disposed?              
             let funcDoc = this._funcDocs.get(editor.document.uri.toString());   // stored target document value
             let doubleSpacing = funcDoc.getDoubleSpacing();                     // get double spacing
             let symbolIndex = editor.selection.start.line - 2;                  // first valid line
@@ -87,31 +88,32 @@ export default class Provider implements vscode.TextDocumentContentProvider
             if(symbolIndex < 0)                                                 // no source document positioning
                 return;                                                         // after updateDocument or line 0 or 1 click
 
-            let native = funcDoc.getNative(symbolIndex);                        // get native symbol string
+            let natSym = funcDoc.getNative(symbolIndex);                        // get native symbol string
+            let natFil = funcDoc.getNativeFilter();                             //            filter
 
-            let chars = { '(':'\\(', ')':'\\)', '[':'\\[', '\r':'' };           // replacement pairs, name:value
-            let filter = native.replace(/[()[]/g, m => chars[m]);               // replace /[names]/globally through values
-            
+            let chars = { '(':'\\(', ')':'\\)', '[':'\\[' };                    // replacement pairs, name:value
+            let natSymFil = natSym.replace(/[()[]/g, m => chars[m]);            // replace /[names]/globally through values
+
             let docContent = sourceEditor.document.getText();                   // get source document content
             let sourceLines = docContent.split("\n");                           // split lines            
             let lines: number[] = [];                                           // prepare match lines number array
             
             sourceLines.forEach((line, i) => {                                  // iterate through sourceLines
-                if(line.match(filter))                                          // if match 
+                if(line.match(natSymFil) && line.match(natFil))                 // if match 
                     lines.push(i);                                              // add line number
             });
-            
+
             let hit = this._lastHit;                                            // last hit shortcut        
 
             if(lines.length){                                                   // any lines?
                 let lineIndex = 0;                                              // assume first match in lines
 
-                if(hit.editor==sourceEditor && hit.native==native && hit.lineIndex<lines.length){   // same editor, same match, hit index in range
+                if(hit.editor==sourceEditor && hit.native==natSym && hit.lineIndex<lines.length){   // same editor, same match, hit index in range
                     lineIndex = hit.lineIndex++;                                // take index, increment hit index
                 }
                 else{
                     hit.editor = sourceEditor;                                  // update hit object
-                    hit.native = native;
+                    hit.native = natSym;
                     hit.lineIndex = 1;
                 }                        
 
@@ -182,10 +184,12 @@ export default class Provider implements vscode.TextDocumentContentProvider
 
 let seq = 0;
 
+// surrounds tabCaption with brackets
+//
 export function encodeLocation(uri: Uri, pos: Position): Uri 
 {
     const query = JSON.stringify([uri.toString(), pos.line, pos.character]);
-    const tabCaption = decodeURIComponent(uri.fsPath).split('\\').pop();
+    const tabCaption = decodeURIComponent(uri.fsPath).split('\\').pop().split('/').pop();
 	return Uri.parse(`${Provider.scheme}:(${tabCaption})?${query}#${seq++}`);
 }
 
@@ -195,10 +199,21 @@ export function decodeLocation(uri: Uri): [Uri, Position]
 	return [Uri.parse(target), new Position(line, character)];
 }
 
+// win32    file:///d:/../name.ext   -> d:\..\name.ext
+// other    file:///home/../name.ext -> /home/../name.ext
+//
 export function decodeFsPath(uri: Uri): string
 {
+    var path;
+
     let [target, line, character] = <[string, number, number]>JSON.parse(uri.query);
-    return decodeURIComponent(Uri.parse(target).toString()).split('///').pop().replace(/\//gi, "\\");
+
+    if(process.platform === "win32")        // darwin (=macos) | freebsd | linux | sunos | win32    
+        path = decodeURIComponent(Uri.parse(target).toString()).split('///').pop().replace(/\//gi, "\\");    
+    else
+        path = decodeURIComponent(Uri.parse(target).toString()).split('//').pop();
+
+    return path;
 }    
 
 // delay - for executing posSourceSelTarget
@@ -360,4 +375,9 @@ class Timer
 //     catch(error){
 //         return true;
 //     }
+// }
+
+// function quote4Regex(str) 
+// {
+//     return str.replace(/(?=[\/\\^$*+?.()|{}[\]])/g, "\\");
 // }
