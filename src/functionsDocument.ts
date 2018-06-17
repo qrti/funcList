@@ -14,24 +14,26 @@ export default class FunctionsDocument
 	private _functionList: Map<string, {native: string, num: number, index: number}>;
     private _sort: number = 0;
     private _doubleSpacing: boolean;
-
+    private _filter;        // : {extensions: string[], native: string, display: string, sort: number};
 	private _lines: string[];
 
     // constructor(target_uri: vscode.Uri, emitter: vscode.EventEmitter<vscode.Uri>)
-    constructor(sourceEditor: vscode.TextEditor, targetEditor: vscode.TextEditor)
+    constructor(sourceEditor: vscode.TextEditor, targetEditor: vscode.TextEditor, filter)
     {
         this._sourceEditor = sourceEditor;                                                    
-        this._targetEditor = targetEditor;                                                    
+        this._targetEditor = targetEditor;          
+        this._filter = filter;                                          
 		// this._emitter = emitter;                                        
         
         let config = workspace.getConfiguration('funcList');                        // get config
-        let sort = +config.get("sortList");                                         // default sort for new FuncDoc
         this._doubleSpacing = config.get("doubleSpacing");                          // double spacing
+
+        let sort = +this._filter.sort;                                              // default sort for new FuncDoc
 
         this._functionList = this.getFunctionList();                                // get function list     
         this.sortFunctionList(sort);                                                // sort it if necessary
 
-        this.populate();                                                            // populate target
+        this.populate();                                                            // populate targe
 	}
     
     public getNative(index)                                                         // return stored native match
@@ -63,8 +65,7 @@ export default class FunctionsDocument
 
     public getNativeFilter()
     {
-        let config = workspace.getConfiguration('funcList');                        // get config
-        return stringRegExp(config.get("nativeFilter")); 
+        return stringRegExp(this._filter.native); 
     }
 
     private populate() 
@@ -91,11 +92,10 @@ export default class FunctionsDocument
     {
         let sourceDoc = this._sourceEditor.document;                                // get source document
 
-        let config = workspace.getConfiguration('funcList');                        // get config
-        let nativeFilter = stringRegExp(config.get("nativeFilter"));                // native filter
+        let nativeFilter = stringRegExp(this._filter.native);                       // native filter
 
         let grin = { value: 0 };                                                    // group index
-        let displayFilter = stringRegExp(config.get("displayFilter"), grin);        // display 
+        let displayFilter = stringRegExp(this._filter.display, grin);               // display 
 
         let docContent = sourceDoc.getText();                                       // get doc text
         let native = docContent.match(nativeFilter);                                // nativeFind array    

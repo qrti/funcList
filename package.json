@@ -2,7 +2,7 @@
     "name": "funclist",
     "displayName": "Show Functions",
     "description": "List functions, symbols, bookmarks by configurable regular expressions",
-    "version": "7.2.1",
+    "version": "7.3.0",
     "publisher": "qrti",
     "author": {
         "name": "qrti"
@@ -69,28 +69,91 @@
             }
         ],
         "configuration": {
-            "title": "funcList Configuration",
-            "type": "object",
             "properties": {
-                "funcList.nativeFilter": {
-                    "type": "string",
-                    "default": "/^[a-z]+\\s+\\w+\\(/mgi",
-                    "description": "regEx to build native match list"
-                },
-                "funcList.displayFilter": {
-                    "type": "string",
-                    "default": "/\\S* +(\\w+)/1",
-                    "description": "regEx to trim native matches for display"
-                },
-                "funcList.sortList": {
-                    "type": "number",
-                    "default": 0,
-                    "description": "0=appear, 1=nocase, 2=case"
-                },
-                "funcList.doubleSpacing": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "false=off, true=on"
+                "funcList": {
+                    "type": "object",
+                    "properties": {
+                        "doubleSpacing": {
+                            "type": "boolean",
+                            "description": "false=off, true=on"
+                        },
+                        "filters": {
+                            "type": "array",
+                            "description": "function filters",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "extensions": {
+                                        "type": "array",
+                                        "description": "file extensions",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "native": {
+                                        "type": "string",
+                                        "description": "regEx to build native match list"
+                                    },
+                                    "display": {
+                                        "type": "string",
+                                        "description": "regEx to trim native matches for display"
+                                    },
+                                    "sort": {
+                                        "type": "number",
+                                        "description": "0 - unsorted order of appearance\n1 - sorted ignore case\n2 - sorted obey case"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "doubleSpacing": false,
+                        "filters": [
+                            {
+                                "extensions": [
+                                    ".c",
+                                    ".h"
+                                ],
+                                "native": "/^[a-z]+\\s+\\w+\\(/mgi",
+                                "display": "/\\S* +(\\w+)/1",
+                                "sort": 0
+                            },
+                            {
+                                "extensions": [
+                                    ".cpp",
+                                    ".hpp"
+                                ],
+                                "native": "/(?:^\\w+\\s+|^)\\w+[:]*\\w+\\(/mgi",
+                                "display": "/[\\S ]+(\\w+)/",
+                                "sort": 0
+                            },
+                            {
+                                "extensions": [
+                                    ".ts",
+                                    ".php"
+                                ],
+                                "native": "/(?:^|\\s)function\\s+\\w+\\(/mg",
+                                "display": "/\\s*function\\s+(\\w+)/1",
+                                "sort": 0
+                            },
+                            {
+                                "extensions": [
+                                    ".asm"
+                                ],
+                                "native": "/^\\w+:\\s*$/mg",
+                                "display": "/\\w+/",
+                                "sort": 0
+                            },
+                            {
+                                "extensions": [
+                                    ".ps1"
+                                ],
+                                "native": "/function\\s+\\w+-?\\w*\\s*{/img",
+                                "display": "/function\\s+(\\w+-?\\w*)/1i",
+                                "sort": 0
+                            }
+                        ]
+                    }
                 }
             }
         }

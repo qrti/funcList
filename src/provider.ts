@@ -1,11 +1,12 @@
-// funcList extension for vsCode V7.2.1 by qrt@qland.de 180610
+// funcList extension for vsCode V7.3.0 by qrt@qland.de 180617
 //
 // V0.5     initial, document content provider
 // V0.6     regular TextDocument -> refreshable without closing -> keeps width
 // V7.0.0   back to (modified) document content provider
 // V7.1.0   changed end of line handling
 // V7.2.1   linux/mac path bug fix, corrected symbol match, new sort option
-// 
+// V7.3.0   global filters for multiple filtypes
+//
 // todo:
 // - double line space option
 // - position after calling F1/Show Functions
@@ -144,12 +145,34 @@ export default class Provider implements vscode.TextDocumentContentProvider
         if(sourceEditor.document.uri.scheme != Provider.scheme){                                            // existing funcList file?                                    
             const targetUri = encodeLocation(sourceEditor.document.uri, sourceEditor.selection.active);     // encode target uri, source uri in query
 
-            workspace.openTextDocument(targetUri).then(targetDoc => {                                       // open new TextDocument as target                     
-                let xxx = window.showTextDocument(targetDoc, sourceEditor.viewColumn + 1).then(targetEditor => {      // show new TextDocument                     
-                    let funcDoc = new FunctionsDocument(sourceEditor, targetEditor);                        // instantiate and fill new funcDoc
-                    this._funcDocs.set(targetUri.toString(), funcDoc);                                      // add new funcDoc to funcDocs                                                            
-                });                                                             
-            });            
+            let config = workspace.getConfiguration('funcList');                // get config
+            var filters = config.get('filters');                                //     filter array
+            var filter;                                                         // prepare filter
+            var fname = sourceEditor.document.fileName.toLowerCase();           //         extension match
+            var len = fname.length;
+
+            (function(){                                                        // match extension
+                Object.keys(filters).forEach(f => { 
+                    filters[f].extensions.forEach(e => {
+                        if(e.toLowerCase() === fname.substr(len - e.length, e.length)){
+                            filter = filters[f]; 
+                            return;
+                        }
+                    });   
+                });
+            })();
+
+            if(!filter){                                                        
+                window.showInformationMessage('no filter for filetype');
+            }
+            else{
+                workspace.openTextDocument(targetUri).then(targetDoc => {                                       // open new TextDocument as target                     
+                    let xxx = window.showTextDocument(targetDoc, sourceEditor.viewColumn + 1).then(targetEditor => {    // show new TextDocument                     
+                        let funcDoc = new FunctionsDocument(sourceEditor, targetEditor, filter);                        // instantiate and fill new funcDoc
+                        this._funcDocs.set(targetUri.toString(), funcDoc);                                      // add new funcDoc to funcDocs                                                            
+                    });                                                             
+                });            
+            }
         }
 
         return null;

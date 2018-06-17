@@ -1,12 +1,14 @@
 # FuncList
 Retrieves functions, symbols, bookmarks from text or source files and lists references in a side editor. Clicking a references will reveal the corresponding position in text or source file.
 
-**New version with bugfixes and additional sort option**  
--> [History](#history) 
+**New version** -> [History](#history)  
+\- file type aware filters  
+\- 5 predefined filters  
+\- additional sort option  
+\- bugfixes
 
 ### Short Test Drive
-- open a C source file  
-  see [Examples](#examples) for different file settings
+- open a source file (.c .h .cpp .hpp .ts .php .ps1 .asm)
 - select `F1 > Show Functions`
 - a side editor opens and shows a reference list
 - click a reference
@@ -14,22 +16,18 @@ Retrieves functions, symbols, bookmarks from text or source files and lists refe
 ![funclist in action](images/funcList.gif)
 
 # Settings
-__.vscode/settings.json__
+`filters.extensions`  
+list of file extension strings
 
-    "funcList.nativeFilter": "",
-    "funcList.displayFilter": "",
-    "funcList.sortList": 1,
-    "funcList.doubleSpacing": false
-
-`nativeFilter`  
+`filters.native`  
 regular expression to match functions, symbols, bookmarks  
-_(nativeFilter does not allow regEx groups)_
+_(native does not allow regEx groups)_
 
-`displayFilter`  
+`filters.display`  
 regular expression to trim matches of nativeFilter for clean display  
-_(displayFilter allows regEx groups 0-9 in options, see examples)_
+_(display allows regEx groups 0-9 in options, see examples)_
 
-`sortList`  
+`filters.sort`  
 0 = unsorted, order of appearance (appear)  
 1 = sorted, ignore case (nocase)  
 2 = sorted, obey case (case)
@@ -40,15 +38,15 @@ false = off
 true = on
 
 # Examples
-### TypeScript Filter
+### TypeScript/Php Function Filter
 
-    "funcList.nativeFilter": "/(?:^|\\s)function\\s+\\w+\\(/mg"
+    "native": "/(?:^|\\s)function\\s+\\w+\\(/mg"
 
 `function encodeLocation(`  
 `function dispose(`  
 simple functions will be found
 
-    "funcList.displayFilter": "/\\s*function\\s+(\\w+)/1"
+    "display": "/\\s*function\\s+(\\w+)/1"
 
 `encodeLocation`  
 `dispose`  
@@ -58,13 +56,13 @@ _(Thanks to Avol-V)_
 
 ### Simple C Function Filter
 
-    "funcList.nativeFilter": "/^[a-z]+\\s+\\w+\\(/mgi"
+    "native": "/^[a-z]+\\s+\\w+\\(/mgi"
 
 `int main(`  
 `void initSerial(`  
 simple function headers will be found
 
-    "funcList.displayFilter": "/\\S* +(\\w+)/1"
+    "display": "/\\S* +(\\w+)/1"
 
 `main`  
 `initSerial`  
@@ -72,7 +70,7 @@ function names without return value and opening bracket will be displayed
 
 ### Assembler Target Filter
 
-    "funcList.nativeFilter": "/^\\w+:\\s*$/mg"
+    "native": "/^\\w+:\\s*$/mg"
 
 `encodeByte:`  
 `doSleep:`  
@@ -82,7 +80,7 @@ standalone targets on beginning of lines are found
 `abc17: ;comment`  
 targets with following instruction or comment are not found
 
-    "funcList.displayFilter": "/\\w+/"
+    "display": "/\\w+/"
     
 `encodeByte`  
 `doSleep`  
@@ -90,28 +88,31 @@ targets are listed without colon or trailing spaces
 
 ### PowerShell Function Filter
 
-"funcList.nativeFilter": "/function\\s+\\w+-?\\w*\\s*{/img"  
-"funcList.displayFilter": "/function\\s+(\\w+-?\\w*)/1i"
+    "native": "/function\\s+\\w+-?\\w*\\s*{/img"  
+    "display": "/function\\s+(\\w+-?\\w*)/1i"
 
 _(Thanks to Paradox355)_
 
 ### Bookmark Filter
 
-    "funcList.nativeFilter": "/^bookmark .+$/mg"
+    "native": "/^bookmark .+$/mg"
 
 `bookmark my mark 123`  
 `bookmark huubaBooba`  
 or similar will be found
 
-    "funcList.displayFilter": "/\\w+\\s+(.*\\w)/1"
+    "display": "/\\w+\\s+(.*\\w)/1"
 
 `my mark 123`  
 `huubaBooba`  
 will be listed
 
 # Hints
+ 
+- to show pure results of native filter use  
+  `"display": "/.*/"`
 - reference lists contribute two context menu entries  
-  _'Switch Sort'_ for switching sort mode  
+  _'Switch Sort'_ for switching sort modes  
   _'Refresh'_ for manual refreshing the reference list
 - reference list tab names are surrounded by brackets
 - reference lists are read only and can't be saved
@@ -119,7 +120,9 @@ will be listed
   selectable with consecutive clicks  
 - source files can have multiple reference lists  
   slanted tab names indicate temporary lists  
-  double click tabs to make them resident
+  double click tabs to make them resident  
+- settings from previous versions can be deleted  
+  `"funcList.xxx": "xxx"`
 
 # History
 - __V0.5__  
@@ -146,8 +149,12 @@ will be listed
 
 - __V7.2.1__  
   new sort options -> [Settings](#settings)  
-  linux/mac path bug fix  
+  Linux/Mac path bug fix  
   corrected symbol match
+
+- __V7.3.0__  
+   file extension aware filters  
+   5 predefined filters
 
 # How to run locally
 - `npm run compile`  
