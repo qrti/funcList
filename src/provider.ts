@@ -1,4 +1,4 @@
-// funcList extension for vsCode V7.3.0 by qrt@qland.de 180617
+// funcList extension for vsCode V7.3.1 by qrt@qland.de 180620
 //
 // V0.5     initial, document content provider
 // V0.6     regular TextDocument -> refreshable without closing -> keeps width
@@ -6,6 +6,7 @@
 // V7.1.0   changed end of line handling
 // V7.2.1   linux/mac path bug fix, corrected symbol match, new sort option
 // V7.3.0   global filters for multiple filtypes
+// V7.3.1   updated readme
 //
 // todo:
 // - double line space option

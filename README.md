@@ -16,18 +16,18 @@ Retrieves functions, symbols, bookmarks from text or source files and lists refe
 ![funclist in action](images/funcList.gif)
 
 # Settings
-`filters.extensions`  
+`extensions`  
 list of file extension strings
 
-`filters.native`  
+`native`  
 regular expression to match functions, symbols, bookmarks  
 _(native does not allow regEx groups)_
 
-`filters.display`  
+`display`  
 regular expression to trim matches of nativeFilter for clean display  
 _(display allows regEx groups 0-9 in options, see examples)_
 
-`filters.sort`  
+`sort`  
 0 = unsorted, order of appearance (appear)  
 1 = sorted, ignore case (nocase)  
 2 = sorted, obey case (case)
@@ -36,6 +36,39 @@ _(display allows regEx groups 0-9 in options, see examples)_
 extended space in symbol list  
 false = off  
 true = on
+
+**Settings should look like this**
+
+    "funcList": {
+        "doubleSpacing": false,
+        
+        "filters": [
+            {
+                "extensions": [
+                    ".c",
+                    ".h"
+                ],
+                "native": "/^[a-z]+\\s+\\w+\\(/mgi",
+                "display": "/\\S* +(\\w+)/1",
+                "sort": 0
+            },
+            {
+                ...
+            }
+        ]
+    }
+
+**Add your own filetypes and filters**  
+\- go to global (default) settings with 'Menu/File/Preferences/Settings'  
+\- enter funcList in the search field  
+\- right click the little pen left of `"funcList": {`  
+\- click 'Copy to Settings'  
+\- add your entry to 'User Settings'
+
+\- or copy funcList settings to local .vscode folders
+
+\- no asterisk allowed in extensions  
+\- check for correct bracing and commas
 
 # Examples
 ### TypeScript/Php Function Filter
@@ -155,6 +188,9 @@ will be listed
 - __V7.3.0__  
    file extension aware filters  
    5 predefined filters
+
+- __V7.3.1__  
+    updated readme
 
 # How to run locally
 - `npm run compile`  
