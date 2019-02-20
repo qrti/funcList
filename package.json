@@ -2,7 +2,7 @@
     "name": "funclist",
     "displayName": "Show Functions",
     "description": "List functions, symbols, bookmarks by configurable regular expressions",
-    "version": "7.3.0",
+    "version": "7.6.0",
     "publisher": "qrti",
     "author": {
         "name": "qrti"
@@ -47,28 +47,19 @@
                     "command": "contextmenu.switchSort",
                     "group": "myGroup@1",
                     "titel": "Switch Sort",
-                    "when": "editorLangId == locations"
+                    "when": "resourceScheme == functions"
                 },
                 {
                     "command": "contextmenu.refresh",
                     "group": "myGroup@2",
                     "titel": "Refresh",
-                    "when": "editorLangId == locations"
+                    "when": "resourceScheme == functions"
                 }
             ]
         },
-        "languages": [
-            {
-                "id": "locations",
-                "aliases": [
-                    "Locations"
-                ],
-                "extensions": [
-                    ")"
-                ]
-            }
-        ],
         "configuration": {
+            "type": "object",
+            "title": "funcList configuration",
             "properties": {
                 "funcList": {
                     "type": "object",

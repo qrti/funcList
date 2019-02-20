@@ -1,7 +1,7 @@
 'use strict';
 
 import { workspace, languages, window, commands, ExtensionContext, Disposable } from 'vscode';
-import ContentProvider, { encodeLocation } from './provider';
+import ContentProvider, { encodeUri } from './provider';
 
 export function activate(context: ExtensionContext) 
 {
@@ -15,12 +15,12 @@ export function activate(context: ExtensionContext)
         return provider.newDocument(editor);
 	});
 
-    let contextMenuSwitchSort = commands.registerCommand('contextmenu.switchSort', () => {
-        provider.updateDocument(true);
+    let contextMenuSwitchSort = commands.registerCommand('contextmenu.switchSort', async () => {
+        provider.updateDocument(true);        
     });
     
-    let contextMenuRefresh = commands.registerCommand('contextmenu.refresh', () => {
-        provider.updateDocument(false);
+    let contextMenuRefresh = commands.registerCommand('contextmenu.refresh', async () => {
+        provider.updateDocument(false);        
     });
         
 	context.subscriptions.push(

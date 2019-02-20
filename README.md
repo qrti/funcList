@@ -1,11 +1,12 @@
 # FuncList
 Retrieves functions, symbols, bookmarks from text or source files and lists references in a side editor. Clicking a references will reveal the corresponding position in text or source file.
 
-**New version** -> [History](#history)  
-\- file type aware filters  
-\- 5 predefined filters  
-\- additional sort option  
-\- bugfixes
+**New Version** -> [History](#history)  
+reworked virtual document handling
+
+**Change of Behavior**  
+source files can't have multiple reference lists anymore  
+only temporary lists with slanted (tab) titles are updated correctly
 
 ### Short Test Drive
 - open a source file (.c .h .cpp .hpp .ts .php .ps1 .asm)
@@ -151,9 +152,6 @@ will be listed
 - reference lists are read only and can't be saved
 - multiple found references are marked with bracketed numbers  
   selectable with consecutive clicks  
-- source files can have multiple reference lists  
-  slanted tab names indicate temporary lists  
-  double click tabs to make them resident  
 - settings from previous versions can be deleted  
   `"funcList.xxx": "xxx"`
 
@@ -191,6 +189,9 @@ will be listed
 
 - __V7.3.1__  
     updated readme
+
+- __V7.6.0__  
+    reworked virtual document handling
 
 # How to run locally
 - `npm run compile`  

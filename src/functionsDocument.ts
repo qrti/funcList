@@ -7,22 +7,23 @@ import { decodeFsPath } from './provider';
 export default class FunctionsDocument
 {
     readonly NUM_SORTS = 3;
-    
+
     // private _emitter: vscode.EventEmitter<vscode.Uri>;    
-	private _targetEditor: vscode.TextEditor;
 	private _sourceEditor: vscode.TextEditor;
 	private _functionList: Map<string, {native: string, num: number, index: number}>;
     private _sort: number = 0;
     private _doubleSpacing: boolean;
     private _filter;        // : {extensions: string[], native: string, display: string, sort: number};
 	private _lines: string[];
+    private _content: string;
+    private _uri: vscode.Uri;                                                       // unused
 
     // constructor(target_uri: vscode.Uri, emitter: vscode.EventEmitter<vscode.Uri>)
-    constructor(sourceEditor: vscode.TextEditor, targetEditor: vscode.TextEditor, filter)
+    constructor(sourceEditor: vscode.TextEditor, filter, uri: vscode.Uri)
     {
         this._sourceEditor = sourceEditor;                                                    
-        this._targetEditor = targetEditor;          
-        this._filter = filter;                                          
+        this._filter = filter;             
+        this._uri = uri;                             
 		// this._emitter = emitter;                                        
         
         let config = workspace.getConfiguration('funcList');                        // get config
@@ -32,8 +33,8 @@ export default class FunctionsDocument
 
         this._functionList = this.getFunctionList();                                // get function list     
         this.sortFunctionList(sort);                                                // sort it if necessary
-
-        this.populate();                                                            // populate targe
+        
+        this.prepContent();                                                         // prepare content 
 	}
     
     public getNative(index)                                                         // return stored native match
@@ -44,6 +45,16 @@ export default class FunctionsDocument
     public getDoubleSpacing()                                                       // return double spacing
     {
         return this._doubleSpacing;
+    }
+
+    public getContent()                                                             // return content
+    {
+        return this._content;
+    }
+
+    public getUri()                                                             
+    {
+        return this._uri;
     }
 
     public update(sortSwitch)
@@ -60,7 +71,7 @@ export default class FunctionsDocument
             this.sortFunctionList(sort);                                            // sort
         }
 
-        this.populate();                                                            // populate target            
+        this.prepContent();                                                         // prepare content            
     }
 
     public getNativeFilter()
@@ -68,7 +79,7 @@ export default class FunctionsDocument
         return stringRegExp(this._filter.native); 
     }
 
-    private populate() 
+    private prepContent() 
     {
         this._lines = [`(${this._functionList.size} matches, ${this._sort ? this._sort==1 ? 'nocase' : 'case' : 'appear'})\n`];
 
@@ -76,15 +87,8 @@ export default class FunctionsDocument
             this._lines.push(display + (value.num==1 ? "" : ` (${value.num})`));
         });
 
-        let targetDoc = this._targetEditor.document;
-        applyEdit(targetDoc, {start: {line: 0, char: 0}, end: {line: Number.MAX_SAFE_INTEGER, char: 0}}, this._lines.join(this._doubleSpacing ? '\n\n' : '\n'));           
-        
-        let posSel = new vscode.Position(0, 0);                                     // jump to first line        
-        let selection = new vscode.Selection(posSel, posSel);                       // no selection 
-        let range = new vscode.Range(posSel, posSel);                               // to prevent source positioning
-        this._targetEditor.revealRange(range);          
-        this._targetEditor.selection = selection;                        
-
+        this._content = this._lines.join(this._doubleSpacing ? '\n\n' : '\n');
+                
         // this._emitter.fire(this._target_uri);        
     }
 
@@ -158,16 +162,4 @@ function stringRegExp(s: string, grin?: { value: number } ): RegExp
     }
 
     return new RegExp(pattern, flags);    
-}
-
-function applyEdit(doc, coords, content)
-{    
-    let start = new vscode.Position(coords.start.line, coords.start.char);
-    let end = new vscode.Position(coords.end.line, coords.end.char);
-    let range = new vscode.Range(start, end);   
-    
-    let wedit = new vscode.TextEdit(range, content);                    
-    let workspaceEdit = new vscode.WorkspaceEdit();
-    workspaceEdit.set(doc.uri, [wedit]);
-    workspace.applyEdit(workspaceEdit);    
 }
