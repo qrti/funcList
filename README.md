@@ -190,7 +190,7 @@ will be listed
 - __V7.3.1__  
     updated readme
 
-- __V7.6.0__  
+- __V7.6.1__  
     reworked virtual document handling
 
 # How to run locally
