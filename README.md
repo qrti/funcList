@@ -60,16 +60,15 @@ true = on
     }
 
 **Add your own filetypes and filters**  
-\- go to global (default) settings with 'Menu/File/Preferences/Settings'  
+\- open settings with 'Menu/File/Preferences/Settings'  
 \- enter funcList in the search field  
-\- right click the little pen left of `"funcList": {`  
-\- click 'Copy to Settings'  
-\- add your entry to 'User Settings'
-
-\- or copy funcList settings to local .vscode folders
-
-\- no asterisk allowed in extensions  
-\- check for correct bracing and commas
+\- choose User or Workspace Settings  
+\- click 'Edit in settings.json'  
+\- place the cursor to a fitting place  
+\- type funcList and hit enter to insert predefined settings  
+\- edit them after your needs  
+\- check for correct bracing and commas  
+\- see -> [Hints](#hints) for easy regEx testing
 
 # Examples
 ### TypeScript/Php Function Filter
@@ -152,6 +151,9 @@ will be listed
 - reference lists are read only and can't be saved
 - multiple found references are marked with bracketed numbers  
   selectable with consecutive clicks  
+- easy testing with online regEx engines  
+  for example [regex101.com](https://regex101.com)  
+  (omit regEx groups in display filter for testing)  
 - settings from previous versions can be deleted  
   `"funcList.xxx": "xxx"`
 
