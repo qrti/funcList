@@ -1,4 +1,4 @@
-// funcList extension for vsCode V7.6.1 by qrt@qland.de 190221
+// funcList extension for vsCode V7.6.2 by qrt@qland.de 190222
 //
 // V0.5     initial, document content provider
 // V0.6     regular TextDocument -> refreshable without closing -> keeps width
@@ -8,7 +8,7 @@
 // V7.3.0   global filters for multiple filtypes
 // V7.3.1   updated readme
 // V7.6.0   reworked virtual document handling
-// V7.6.1   updated readme
+// V7.6.2   updated readme
 //
 // todo:
 
