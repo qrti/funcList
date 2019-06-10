@@ -2,7 +2,7 @@
     "name": "funclist",
     "displayName": "Show Functions",
     "description": "List functions, symbols, bookmarks by configurable regular expressions",
-    "version": "7.6.1",
+    "version": "7.6.3",
     "publisher": "qrti",
     "author": {
         "name": "qrti"

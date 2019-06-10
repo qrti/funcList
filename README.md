@@ -91,6 +91,12 @@ _(Thanks to Avol-V)_
 
     "native": "/^[a-z]+\\s+\\w+\\(/mgi"
 
+or  
+
+    "native": "/^[a-z]+\\s+.*{][)$/img"
+
+_(Thanks to sungoth)_
+
 `int main(`  
 `void initSerial(`  
 simple function headers will be found
@@ -118,6 +124,13 @@ targets with following instruction or comment are not found
 `encodeByte`  
 `doSleep`  
 targets are listed without colon or trailing spaces
+
+### Python Function Filter
+
+    "native": "/(?:^def|^class|^\\s+def|^\\s+class)\\s\\w+\\s*\\((?:\\s*|\\w+|[\\w\\*,\\s\\'\"=\\(\\)\\{\\}\\[\\]\\/\\.]+)\\):/img"
+    "display": "/.*\\)/"
+
+_(Thanks to Derek)_
 
 ### PowerShell Function Filter
 
@@ -194,6 +207,9 @@ will be listed
 
 - __V7.6.2__  
     reworked virtual document handling
+
+- __V7.6.3__  
+    additional simple C- and new Python-Filter added to documentation
 
 # How to run locally
 - `npm run compile`  

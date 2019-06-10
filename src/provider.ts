@@ -9,6 +9,7 @@
 // V7.3.1   updated readme
 // V7.6.0   reworked virtual document handling
 // V7.6.2   updated readme
+// V7.6.3   additional simple C- and new Python-Filter added to documentation
 //
 // todo:
 
