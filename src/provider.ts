@@ -60,7 +60,8 @@ export default class Provider implements vscode.TextDocumentContentProvider
     private _onDidChangeTextEditorSelection(change: vscode.TextEditorSelectionChangeEvent) 
     {    
         let editor = change.textEditor;                                                 // get active editor
-
+        //console.log(editor);
+        //console.log(Provider.scheme);
         if(editor.document.uri.scheme === Provider.scheme)                              // funcList files only 
             if(!this._timer.timeLeft())                                                 // last timer ready?
                 this._timer.start(() => this.posSourceSelTarget(editor), 50, 100);      // delay, block
@@ -75,14 +76,31 @@ export default class Provider implements vscode.TextDocumentContentProvider
             this._funcDocs.delete(mapUri.toString());                           // delete it
     }
 
+    private filtersMatch(line, filters)
+    {
+        //console.log("filtersMatch");
+        //console.log(line);
+        let retVal = false;
+        Object.keys(filters).forEach(i => {
+            if(line.match(filters[i])){
+                //console.log("found");
+                retVal = true;
+                return;
+            }
+        });
+
+        return retVal;
+    }
+
     private posSourceSelTarget(editor)
     {
+        //console.log(editor);
         let sourceFsPath = decodeFsPath(editor.document.uri);                   // get original source fsPath from target uri.query
-
+        //console.log(sourceFsPath);
         // find current sourceEditor for original source fsPath, 
         // the original sourceEditor gets unvalid every time it loses focus
         let sourceEditor = window.visibleTextEditors.find(editor => editor.document.uri.fsPath === sourceFsPath);
-        
+        //console.log(sourceEditor);
         if(sourceEditor){                                                       // if not invalid or disposed
             let funcDoc = this.getFuncDoc(editor.document.uri);                 // search funcDoc in map
             let doubleSpacing = funcDoc.getDoubleSpacing();                     // get double spacing
@@ -96,24 +114,28 @@ export default class Provider implements vscode.TextDocumentContentProvider
 
                 symbolIndex = Math.round(symbolIndex / 2 + 0.1);                // calc line
             }
-
+            //console.log(symbolIndex);
+            //console.log(funcDoc);
             if(symbolIndex < 0)                                                 // no source document positioning
                 return;                                                         // after updateDocument or line 0 or 1 click
 
             let natSym = funcDoc.getNative(symbolIndex);                        // get native symbol string
-            let natFil = funcDoc.getNativeFilter();                             //            filter
-
+            //console.log(natSym);
+            let natFils = funcDoc.getNativeFilters();                             //            filter
+            //console.log(natFils);
             let chars = { '(':'\\(', ')':'\\)', '[':'\\[' };                    // replacement pairs, name:value
             let natSymFil = natSym.replace(/[()[]/g, m => chars[m]);            // replace /[names]/globally through values
 
             let docContent = sourceEditor.document.getText();                   // get source document content
             let sourceLines = docContent.split("\n");                           // split lines            
             let lines: number[] = [];                                           // prepare match lines number array
-            
+            //console.log(sourceLines);
             sourceLines.forEach((line, i) => {                                  // iterate through sourceLines
-                if(line.match(natSymFil) && line.match(natFil))                 // if match 
+                if(line.match(natSymFil) && this.filtersMatch(line, natFils))                 // if match 
                     lines.push(i);                                              // add line number
             });
+
+            //console.log(lines.length);
 
             let hit = this._lastHit;                                            // last hit shortcut        
 
@@ -152,35 +174,44 @@ export default class Provider implements vscode.TextDocumentContentProvider
     // command palette 'Function List'
     //
     public async newDocument(sourceEditor)
-    {                
+    {         
+        //console.log(sourceEditor.document.uri.scheme);
+        //console.log(Provider.scheme);
         if(sourceEditor.document.uri.scheme != Provider.scheme){                // block funcList files                                
             let config = workspace.getConfiguration('funcList');                // get config
-            var filters = config.get('filters');                                //     filter array
-            var filter;                                                         // prepare filter
+
+            var filters = config.get('filters');    
+            //console.log(filters);                            //     filter array
+            var selectedFilters = [];                                                         // prepare filter
             var fname = sourceEditor.document.fileName.toLowerCase();           //         extension match
+            //console.log(fname);
             var len = fname.length;
 
             (function(){                                                        // match extension
                 Object.keys(filters).forEach(f => { 
+                    //console.log(filters[f]);
                     filters[f].extensions.forEach(e => {
                         if(e.toLowerCase() === fname.substr(len - e.length, e.length)){
-                            filter = filters[f]; 
+                            selectedFilters.push(filters[f]); 
                             return;
                         }
                     });   
                 });
             })();
 
-            if(!filter){                                                                    // extension not found
+            if(!selectedFilters[0]){                                                                    // extension not found
                 window.showInformationMessage('no filter for filetype');
             }
-            else{                
+            else{     
+                //console.log(sourceEditor);           
                 const targetUri = encodeUri(sourceEditor.document.uri, true);               // encode target uri, source uri in query, fragment++
+                //console.log(targetUri);
                 const mapUri = targetUri.with( { fragment: "0" } );                         // mapUri with fragment 0
+                //console.log(mapUri.toString());
                 let funcDoc = this._funcDocs.get(mapUri.toString());                        // search funcDoc in map
 
                 if(!funcDoc){                                                               // new funcDoc
-                    funcDoc = new FunctionsDocument(sourceEditor, filter, targetUri);       // prepare new funcDoc content
+                    funcDoc = new FunctionsDocument(sourceEditor, selectedFilters, targetUri);       // prepare new funcDoc content
                     this._funcDocs.set(mapUri.toString(), funcDoc);                         // add new funcDoc to funcDocs                                                            
                 }
                 else{                                                                       // already existing funcDoc
