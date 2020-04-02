@@ -42,7 +42,7 @@ true = on
 
     "funcList": {
         "doubleSpacing": false,
-        
+        "sort": 0
         "filters": [
             {
                 "extensions": [
@@ -50,8 +50,7 @@ true = on
                     ".h"
                 ],
                 "native": "/^[a-z]+\\s+\\w+\\(/mgi",
-                "display": "/\\S* +(\\w+)/1",
-                "sort": 0
+                "display": "/\\S* +(\\w+)/1"
             },
             {
                 ...
