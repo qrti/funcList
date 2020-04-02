@@ -42,7 +42,7 @@ true = on
 
     "funcList": {
         "doubleSpacing": false,
-        "sort": 0
+        "sort": 0,
         "filters": [
             {
                 "extensions": [
