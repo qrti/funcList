@@ -1,19 +1,13 @@
 {
-    "name": "funclist",
-    "displayName": "Show Functions",
-    "description": "List functions, symbols, bookmarks by configurable regular expressions",
-    "version": "7.6.3",
-    "publisher": "qrti",
-    "author": {
-        "name": "qrti"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/qrti/funclist"
-    },
-    "homepage": "https://github.com/qrti/funclist/blob/master/README.md",
+    "name": "Function-List",
+    "displayName": "Function List",
+    "description": "Show function list of Visual Basic, support customizing for other programming languages, it uses regular expression to do filtering.",
+    "version": "1.0.2",
+    "publisher": "chenfengone",
+    "repository": "https://github.com/chenfengone/funcList",
+    "homepage": "https://github.com/chenfengone/funclist/blob/master/README.md",
     "bugs": {
-        "url": "https://github.com/qrti/funclist/issues"
+        "url": "https://github.com/chenfengone/funclist/issues"
     },
     "engines": {
         "vscode": "^1.14.0"
@@ -68,6 +62,10 @@
                             "type": "boolean",
                             "description": "false=off, true=on"
                         },
+                        "sort": {
+                            "type": "number",
+                            "description": "0 - unsorted order of appearance\n1 - sorted ignore case\n2 - sorted obey case"
+                        },
                         "filters": {
                             "type": "array",
                             "description": "function filters",
@@ -88,10 +86,6 @@
                                     "display": {
                                         "type": "string",
                                         "description": "regEx to trim native matches for display"
-                                    },
-                                    "sort": {
-                                        "type": "number",
-                                        "description": "0 - unsorted order of appearance\n1 - sorted ignore case\n2 - sorted obey case"
                                     }
                                 }
                             }
@@ -99,6 +93,7 @@
                     },
                     "default": {
                         "doubleSpacing": false,
+                        "sort": 0,
                         "filters": [
                             {
                                 "extensions": [
@@ -106,8 +101,7 @@
                                     ".h"
                                 ],
                                 "native": "/^[a-z]+\\s+\\w+\\(/mgi",
-                                "display": "/\\S* +(\\w+)/1",
-                                "sort": 0
+                                "display": "/\\S* +(\\w+)/1"
                             },
                             {
                                 "extensions": [
@@ -115,8 +109,7 @@
                                     ".hpp"
                                 ],
                                 "native": "/(?:^\\w+\\s+|^)\\w+[:]*\\w+\\(/mgi",
-                                "display": "/[\\S ]+(\\w+)/",
-                                "sort": 0
+                                "display": "/[\\S ]+(\\w+)/"
                             },
                             {
                                 "extensions": [
@@ -124,25 +117,45 @@
                                     ".php"
                                 ],
                                 "native": "/(?:^|\\s)function\\s+\\w+\\(/mg",
-                                "display": "/\\s*function\\s+(\\w+)/1",
-                                "sort": 0
+                                "display": "/\\s*function\\s+(\\w+)/1"
                             },
                             {
                                 "extensions": [
                                     ".asm"
                                 ],
                                 "native": "/^\\w+:\\s*$/mg",
-                                "display": "/\\w+/",
-                                "sort": 0
+                                "display": "/\\w+/"
                             },
                             {
                                 "extensions": [
                                     ".ps1"
                                 ],
                                 "native": "/function\\s+\\w+-?\\w*\\s*{/img",
-                                "display": "/function\\s+(\\w+-?\\w*)/1i",
-                                "sort": 0
-                            }
+                                "display": "/function\\s+(\\w+-?\\w*)/1i"
+                            },
+							{
+								"extensions": [
+								".py"
+								],
+								"native": "/(?:^def|^class|^\\s+def|^\\s+class)\\s\\w+\\s*\\((?:\\s*|\\w+|[\\w\\*,\\s\\'\"=\\(\\)\\{\\}\\[\\]\\/\\.]+)\\):/img",
+								"display": "/.*\\)/"
+							},
+							{
+								"extensions": [
+									".vb",
+									".LIB"
+								],
+								"native": "/(?:^|^public\\s*)function\\s+\\w*/mgi",
+								"display": "/((?:^|public\\s*)function\\s+\\w+)/1i"
+							},
+							{
+								"extensions": [
+									".vb",
+									".LIB"
+								],
+								"native": "/(?:^|^public\\s*)sub\\s+\\w*/mgi",
+								"display": "/((?:^|public\\s*)sub\\s+\\w+)/1i"
+							}
                         ]
                     }
                 }
@@ -150,9 +163,9 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "tsc -p ./",
-        "compile": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install"
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./"
     },
     "devDependencies": {
         "@types/node": "^6.14.9",
