@@ -211,6 +211,4 @@ will be listed
     additional simple C- and new Python-Filter added to documentation
 
 # How to run locally
-- `npm run compile`  
-to start the compiler in watch mode
 - open this folder in vsCode and press `F5`
