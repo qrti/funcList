@@ -2,7 +2,7 @@
     "name": "Function-List",
     "displayName": "Function List",
     "description": "Show function list of Visual Basic, support customizing for other programming languages, it uses regular expression to do filtering.",
-    "version": "1.0.2",
+    "version": "1.0.5",
     "publisher": "chenfengone",
     "repository": "https://github.com/chenfengone/funcList",
     "homepage": "https://github.com/chenfengone/funclist/blob/master/README.md",
@@ -24,7 +24,7 @@
         "commands": [
             {
                 "command": "editor.printFunctions",
-                "title": "Show Functions"
+                "title": "Show Function List"
             },
             {
                 "command": "contextmenu.switchSort",

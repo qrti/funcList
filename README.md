@@ -1,4 +1,4 @@
-# FuncList
+# Function List
 Retrieves functions, symbols, bookmarks from text or source files and lists references in a side editor. Clicking a references will reveal the corresponding position in text or source file.
 
 **New Version** -> [History](#history)  
@@ -9,12 +9,10 @@ source files can't have multiple reference lists anymore
 only temporary lists with slanted (tab) titles are updated correctly
 
 ### Short Test Drive
-- open a source file (.c .h .cpp .hpp .ts .php .ps1 .asm)
-- select `F1 > Show Functions`
+- open a source file (.vb .c .h .cpp .hpp .ts .php .ps1 .asm)
+- select `F1 > Show Function List`
 - a side editor opens and shows a reference list
 - click a reference
-
-![funclist in action](images/funcList.gif)
 
 # Settings
 `extensions`  
@@ -170,6 +168,10 @@ will be listed
   `"funcList.xxx": "xxx"`
 
 # History
+- __V1.0.5__  
+  add supporting multiple filters and VB language support
+  change the command to 'Show Function List' after pressing key F1
+ 
 - __V0.5__  
   based on document content provider  
   reference lists are read only and have to be closed and reopened for refresh and therefore loose user set width 
