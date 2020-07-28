@@ -169,8 +169,8 @@ will be listed
 
 # History
 - __V1.0.5__  
-  add supporting multiple filters and VB language support
+  add supporting multiple filters and VB language
   change the command to 'Show Function List' after pressing key F1
-
+  
 # How to run locally
 - open this folder in vsCode and press `F5`
