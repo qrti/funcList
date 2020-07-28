@@ -171,46 +171,6 @@ will be listed
 - __V1.0.5__  
   add supporting multiple filters and VB language support
   change the command to 'Show Function List' after pressing key F1
- 
-- __V0.5__  
-  based on document content provider  
-  reference lists are read only and have to be closed and reopened for refresh and therefore loose user set width 
-- __V0.6__  
-  based on untitled file scheme  
-  reference lists are editable and refresh keeps user set width
-- __V0.6.1__  
-  strip CR/LF from native filter to resolve [Issue 1](https://github.com/qrti/funcList/issues/1)  
-  example for TypeScript filter  
-  revised examples
-- __V7.0.0__  
-  back to (improved) document content provider  
-  reference lists are read only and keep user set width  
-  no side effects when closing document or vscode  
-
-- __V7.1.0__  
-  new option 'doubleSpacing' -> [Settings](#settings)  
-  fixed CR/LF bug for Unix/Linux/MacOS documents, addresses again [Issue 1](https://github.com/qrti/funcList/issues/1)
-
-- __V7.1.1__  
-  new example filter for PowerShell functions -> [Examples](#powershell-function-filter)
-
-- __V7.2.1__  
-  new sort options -> [Settings](#settings)  
-  Linux/Mac path bug fix  
-  corrected symbol match
-
-- __V7.3.0__  
-   file extension aware filters  
-   5 predefined filters
-
-- __V7.3.1__  
-    updated readme
-
-- __V7.6.2__  
-    reworked virtual document handling
-
-- __V7.6.3__  
-    additional simple C- and new Python-Filter added to documentation
 
 # How to run locally
 - open this folder in vsCode and press `F5`
