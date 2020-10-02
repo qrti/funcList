@@ -142,6 +142,16 @@
                                 "native": "/function\\s+\\w+-?\\w*\\s*{/img",
                                 "display": "/function\\s+(\\w+-?\\w*)/1i",
                                 "sort": 0
+                            },
+                            {
+                                "extensions": [
+                                    ".cs",
+                                    ".gui",
+                                    ".mis"
+                                ],
+                                "native": "/(?:^\\s*)(function)\\s*(?:([a-zA-Z0-9_]+)::)?([a-zA-Z0-9_]+)\\s*\\(/mg",
+                                "display": "/function\\s+(\\w+-?\\w*)/1i",
+                                "sort": 0
                             }
                         ]
                     }
